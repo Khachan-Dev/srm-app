@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demande de Stage - SRM</title>
+    
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="icon" href="/images/logo.png" type="image/png">
+    <meta name="theme-color" content="#1a73e8">
+
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; direction: ltr; }
+        .form-container { background: white; max-width: 500px; margin: auto; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .logo-box { text-align: center; margin-bottom: 20px; }
+        .logo-box img { width: 180px; height: auto; }
+        h2 { text-align: center; color: #1a73e8; margin-bottom: 25px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #1a73e8; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        button:hover { background: #1557b0; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="logo-box">
+            <img src="/images/logo.png" alt="Logo SRM">
+        </div>
+
+        <h2>Postuler pour un Stage</h2>
+        <form action="/api/stagiaires/register" method="POST">
+            <input type="text" name="nom" placeholder="Nom" required>
+            <input type="text" name="prenom" placeholder="Prénom" required>
+            <input type="email" name="email" placeholder="Votre Email (pour la réponse)" required>
+            <input type="text" name="telephone" placeholder="Téléphone" required>
+            <input type="text" name="filiere" placeholder="Filière / Spécialité" required>
+            <input type="text" name="ecole" placeholder="Établissement / École">
+            <button type="submit">Envoyer la demande</button>
+        </form>
+    </div>
+</body>
+</html>

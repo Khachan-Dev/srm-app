@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gestion des Stagiaires</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px; direction: ltr; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { color: #333; border-bottom: 3px solid #007bff; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #dee2e6; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        .btn { padding: 6px 10px; text-decoration: none; border-radius: 4px; color: white; font-size: 12px; margin-right: 5px; }
+        .btn-accept { background: #28a745; }
+        .btn-reject { background: #ffc107; color: #000; }
+        .btn-delete { background: #dc3545; }
+        .status-badge { font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Liste des Demandes de Stage</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Candidat</th>
+                <th>Filière & École</th>
+                <th>Contact</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="stagiaireList">
+            <tr><td colspan="5">Chargement en cours...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function loadAdminData() {
+        fetch('/admin/data')
+            .then(res => res.json())
+            .then(data => {
+                const list = document.getElementById('stagiaireList');
+                if (data.length === 0) {
+                    list.innerHTML = '<tr><td colspan="5">Aucune demande trouvée.</td></tr>';
+                    return;
+                }
+                list.innerHTML = data.map(s => {
+                    let color = "#6c757d"; 
+                    if(s.status === "Accepté") color = "#28a745";
+                    if(s.status === "Refusé") color = "#ffc107";
+
+                    return `
+                        <tr>
+                            <td><b>${s.nom.toUpperCase()}</b> ${s.prenom}</td>
+                            <td>${s.filiere}<br><small>${s.ecole || ''}</small></td>
+                            <td>${s.telephone}<br><small>${s.email}</small></td>
+                            <td><span class="status-badge" style="color: ${color}">${s.status || 'En attente'}</span></td>
+                            <td>
+                                <a href="/admin/accept/${s.id}" class="btn btn-accept">Accepter</a>
+                                <a href="/admin/reject/${s.id}" class="btn btn-reject">Refuser</a>
+                                <a href="/admin/delete/${s.id}" class="btn btn-delete" onclick="return confirm('Supprimer?')">Suppr.</a>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            });
+    }
+    window.onload = loadAdminData;
+</script>
+</body>
+</html>
