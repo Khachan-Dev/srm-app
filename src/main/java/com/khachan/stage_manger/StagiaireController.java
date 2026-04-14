@@ -16,37 +16,37 @@ public class StagiaireController {
     @Autowired
     private JavaMailSender mailSender;
 
-    // 1. رابط صفحة التسجيل (index.html)
+    // الصفحة الرئيسية (الفورم)
     @GetMapping("/")
-    public String showRegisterPage() {
+    public String index() {
         return "index";
     }
 
-    // 2. ميثود استقبال البيانات من الفورم (باش ما تبقاش تعطيك 404 فالتسجيل)
-    @PostMapping("/api/stagiaires/register")
-    public String registerStagiaire(@ModelAttribute Stagiaire stagiaire) {
-        stagiaire.setStatus("En attente");
-        repository.save(stagiaire);
-        return "redirect:/?success"; // كيرجعك لصفحة التسجيل مع ميساج نجاح
-    }
-
-    // 3. رابط صفحة الإدارة (admin.html)
+    // صفحة الإدارة
     @GetMapping("/admin")
-    public String showAdminPage() {
+    public String admin() {
         return "admin";
     }
 
-    // 4. جلب بيانات المتدربين للجدول (JSON)
+    // استقبال بيانات التسجيل
+    @PostMapping("/api/stagiaires/register")
+    public String register(@ModelAttribute Stagiaire stagiaire) {
+        stagiaire.setStatus("En attente");
+        repository.save(stagiaire);
+        return "redirect:/?success";
+    }
+
+    // جلب البيانات JSON
     @GetMapping("/admin/data")
     @ResponseBody
-    public List<Stagiaire> getAdminData() {
+    public List<Stagiaire> data() {
         return repository.findAll();
     }
 
-    // 5. تحديث الحالة وإرسال الإيميل
+    // تحديث الحالة
     @PostMapping("/admin/update-status/{id}")
     @ResponseBody
-    public String updateStatus(@PathVariable Long id, @RequestParam String status) {
+    public String update(@PathVariable Long id, @RequestParam String status) {
         try {
             Stagiaire s = repository.findById(id).orElseThrow();
             s.setStatus(status);
@@ -54,7 +54,7 @@ public class StagiaireController {
             sendEmail(s.getEmail(), status, s.getNom());
             return "Success";
         } catch (Exception e) {
-            return "Error: " + e.getMessage();
+            return "Error";
         }
     }
 
@@ -63,11 +63,9 @@ public class StagiaireController {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("khachansalah48@gmail.com");
             message.setTo(to);
-            message.setSubject("Réponse SRM Stage");
+            message.setSubject("SRM Stage Update");
             message.setText("Bonjour " + name + ", votre demande est " + status);
             mailSender.send(message);
-        } catch (Exception e) {
-            System.err.println("Email Error: " + e.getMessage());
-        }
+        } catch (Exception e) { }
     }
 }
