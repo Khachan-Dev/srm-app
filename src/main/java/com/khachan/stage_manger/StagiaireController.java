@@ -16,19 +16,19 @@ public class StagiaireController {
     @Autowired
     private JavaMailSender mailSender;
 
-    // 1. الصفحة الرئيسية (الفورم)
+    // الصفحة الرئيسية (الفورم)
     @GetMapping("/")
     public String index() {
         return "index";
     }
 
-    // 2. صفحة الإدارة (Admin)
+    // صفحة الإدارة
     @GetMapping("/admin")
     public String admin() {
         return "admin";
     }
 
-    // 3. استقبال بيانات التسجيل من الفورم
+    // استقبال بيانات التسجيل
     @PostMapping("/api/stagiaires/register")
     public String register(@ModelAttribute Stagiaire stagiaire) {
         stagiaire.setStatus("En attente");
@@ -36,14 +36,14 @@ public class StagiaireController {
         return "redirect:/?success";
     }
 
-    // 4. جلب البيانات للجدول في صفحة Admin (JSON)
+    // جلب البيانات JSON للجدول
     @GetMapping("/admin/data")
     @ResponseBody
     public List<Stagiaire> getAllData() {
         return repository.findAll();
     }
 
-    // 5. تحديث الحالة (Accepté/Refusé) وإرسال الإيميل
+    // تحديث الحالة وإرسال الإيميل
     @PostMapping("/admin/update-status/{id}")
     @ResponseBody
     public String updateStatus(@PathVariable Long id, @RequestParam String status) {
@@ -54,34 +54,23 @@ public class StagiaireController {
             s.setStatus(status);
             repository.save(s);
 
-            // إرسال الإيميل
             sendEmail(s.getEmail(), status, s.getNom());
-
             return "Success";
         } catch (Exception e) {
             return "Error: " + e.getMessage();
         }
     }
 
-    // ميثود إرسال الإيميل
     private void sendEmail(String to, String status, String name) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("khachansalah48@gmail.com");
             message.setTo(to);
-            message.setSubject("Mise à jour de votre demande de stage - SRM");
-            
-            String content = "Bonjour " + name + ",\n\n";
-            if ("Accepté".equals(status)) {
-                content += "Félicitations ! Votre demande de stage a été acceptée.";
-            } else {
-                content += "Nous regrettons de vous informer que votre demande n'a pas été retenue.";
-            }
-            
-            message.setText(content);
+            message.setSubject("Réponse SRM Stage");
+            message.setText("Bonjour " + name + ", votre demande est " + status);
             mailSender.send(message);
         } catch (Exception e) {
-            System.err.println("Erreur d'envoi d'email: " + e.getMessage());
+            System.err.println("Email Error: " + e.getMessage());
         }
     }
 }
