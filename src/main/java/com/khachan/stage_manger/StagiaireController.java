@@ -17,10 +17,14 @@ public class StagiaireController {
     private JavaMailSender mailSender;
 
     @GetMapping("/")
-    public String index() { return "index"; }
+    public String index() {
+        return "index";
+    }
 
     @GetMapping("/admin")
-    public String admin() { return "admin"; }
+    public String admin() {
+        return "admin";
+    }
 
     @PostMapping("/api/stagiaires/register")
     public String register(@ModelAttribute Stagiaire stagiaire) {
@@ -31,7 +35,9 @@ public class StagiaireController {
 
     @GetMapping("/admin/data")
     @ResponseBody
-    public List<Stagiaire> getAllData() { return repository.findAll(); }
+    public List<Stagiaire> getAllData() {
+        return repository.findAll();
+    }
 
     @PostMapping("/admin/update-status/{id}")
     @ResponseBody
@@ -42,7 +48,9 @@ public class StagiaireController {
             repository.save(s);
             sendEmail(s.getEmail(), status, s.getNom());
             return "Success";
-        } catch (Exception e) { return "Error"; }
+        } catch (Exception e) {
+            return "Error";
+        }
     }
 
     private void sendEmail(String to, String status, String name) {
@@ -53,6 +61,8 @@ public class StagiaireController {
             message.setSubject("Réponse SRM Stage");
             message.setText("Bonjour " + name + ", votre demande est " + status);
             mailSender.send(message);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            System.err.println("Email Error: " + e.getMessage());
+        }
     }
 }
