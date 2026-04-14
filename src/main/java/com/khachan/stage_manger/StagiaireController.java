@@ -6,26 +6,25 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.nio.charset.StandardCharsets;
 
-@RestController // استعملنا RestController باش نتهناو من مشاكل Thymeleaf
+@RestController
 public class StagiaireController {
 
     @GetMapping("/")
     public String index() {
-        try {
-            var resource = new ClassPathResource("templates/index.html");
-            return StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            return "Error loading index.html: " + e.getMessage();
-        }
+        return loadFile("static/index.html");
     }
 
     @GetMapping("/admin")
     public String admin() {
+        return loadFile("static/admin.html");
+    }
+
+    private String loadFile(String path) {
         try {
-            var resource = new ClassPathResource("templates/admin.html");
+            var resource = new ClassPathResource(path);
             return StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
         } catch (Exception e) {
-            return "Error loading admin.html: " + e.getMessage();
+            return "File not found in classpath: " + path;
         }
     }
 }
