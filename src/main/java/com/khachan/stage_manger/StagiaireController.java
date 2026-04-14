@@ -16,19 +16,12 @@ public class StagiaireController {
     @Autowired
     private JavaMailSender mailSender;
 
-    // الصفحة الرئيسية (الفورم)
     @GetMapping("/")
-    public String index() {
-        return "index";
-    }
+    public String index() { return "index"; }
 
-    // صفحة الإدارة
     @GetMapping("/admin")
-    public String admin() {
-        return "admin";
-    }
+    public String admin() { return "admin"; }
 
-    // استقبال بيانات التسجيل
     @PostMapping("/api/stagiaires/register")
     public String register(@ModelAttribute Stagiaire stagiaire) {
         stagiaire.setStatus("En attente");
@@ -36,29 +29,20 @@ public class StagiaireController {
         return "redirect:/?success";
     }
 
-    // جلب البيانات JSON للجدول
     @GetMapping("/admin/data")
     @ResponseBody
-    public List<Stagiaire> getAllData() {
-        return repository.findAll();
-    }
+    public List<Stagiaire> getAllData() { return repository.findAll(); }
 
-    // تحديث الحالة وإرسال الإيميل
     @PostMapping("/admin/update-status/{id}")
     @ResponseBody
     public String updateStatus(@PathVariable Long id, @RequestParam String status) {
         try {
-            Stagiaire s = repository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Stagiaire introuvable"));
-            
+            Stagiaire s = repository.findById(id).orElseThrow();
             s.setStatus(status);
             repository.save(s);
-
             sendEmail(s.getEmail(), status, s.getNom());
             return "Success";
-        } catch (Exception e) {
-            return "Error: " + e.getMessage();
-        }
+        } catch (Exception e) { return "Error"; }
     }
 
     private void sendEmail(String to, String status, String name) {
@@ -69,8 +53,6 @@ public class StagiaireController {
             message.setSubject("Réponse SRM Stage");
             message.setText("Bonjour " + name + ", votre demande est " + status);
             mailSender.send(message);
-        } catch (Exception e) {
-            System.err.println("Email Error: " + e.getMessage());
-        }
+        } catch (Exception e) {}
     }
 }
