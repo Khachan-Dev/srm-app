@@ -16,33 +16,36 @@ public class StagiaireController {
     @Autowired
     private JavaMailSender mailSender;
 
-    // 1. عرض صفحة الـ Admin
+    // تفتيح صفحة الفورم (index.html من templates)
+    @GetMapping("/")
+    public String home() {
+        return "index";
+    }
+
+    // تفتيح صفحة الإدارة (admin.html من templates)
     @GetMapping("/admin")
     public String adminPage() {
         return "admin";
     }
 
-    // 2. إرسال البيانات (JSON) للجدول
+    // جلب البيانات للجدول (JSON)
     @GetMapping("/admin/data")
     @ResponseBody
     public List<Stagiaire> getAllStagiaires() {
         return repository.findAll();
     }
 
-    // 3. استقبال طلب تغيير الحالة (Accepté/Refusé) وإرسال إيميل
+    // تحديث الحالة وإرسال الإيميل
     @PostMapping("/admin/update-status/{id}")
     @ResponseBody
     public String updateStatus(@PathVariable Long id, @RequestParam String status) {
         try {
-            // البحث عن المتدرب
             Stagiaire stagiaire = repository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Stagiaire non trouvé"));
 
-            // تحديث الحالة في قاعدة البيانات
             stagiaire.setStatus(status);
             repository.save(stagiaire);
 
-            // إرسال الإيميل تلقائياً
             sendEmail(stagiaire.getEmail(), status, stagiaire.getNom());
 
             return "Success";
@@ -51,19 +54,21 @@ public class StagiaireController {
         }
     }
 
-    // دالة مساعدة لإرسال الإيميل
     private void sendEmail(String to, String status, String name) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("khachansalah48@gmail.com"); // نفس إيميل Brevo ديالك
-        message.setTo(to);
-        message.setSubject("Réponse à votre demande de stage - SRM");
-        
-        if ("Accepté".equals(status)) {
-            message.setText("Bonjour " + name + ",\n\nFélicitations ! Votre demande de stage a été acceptée. Nous vous contacterons bientôt pour les détails.");
-        } else {
-            message.setText("Bonjour " + name + ",\n\nNous regrettons de vous informer que votre demande de stage n'a pas été retenue pour le moment.");
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("khachansalah48@gmail.com"); 
+            message.setTo(to);
+            message.setSubject("Réponse à votre demande de stage - SRM");
+            
+            if ("Accepté".equals(status)) {
+                message.setText("Bonjour " + name + ",\n\nFélicitations ! Votre demande de stage a été acceptée.");
+            } else {
+                message.setText("Bonjour " + name + ",\n\nNous regrettons de vous informer que votre demande n'a pas été retenue.");
+            }
+            mailSender.send(message);
+        } catch (Exception e) {
+            System.out.println("Erreur Email: " + e.getMessage());
         }
-        
-        mailSender.send(message);
     }
 }
