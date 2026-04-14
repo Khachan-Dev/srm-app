@@ -16,37 +16,27 @@ public class StagiaireController {
     @Autowired
     private JavaMailSender mailSender;
 
-    // الصفحة الرئيسية (الفورم)
+    // جرب هادي: الصفحة الرئيسية
     @GetMapping("/")
-    public String index() {
+    public String showIndex() {
         return "index";
     }
 
-    // صفحة الإدارة
+    // جرب هادي: صفحة الإدارة
     @GetMapping("/admin")
-    public String admin() {
+    public String showAdmin() {
         return "admin";
     }
 
-    // استقبال بيانات التسجيل
-    @PostMapping("/api/stagiaires/register")
-    public String register(@ModelAttribute Stagiaire stagiaire) {
-        stagiaire.setStatus("En attente");
-        repository.save(stagiaire);
-        return "redirect:/?success";
-    }
-
-    // جلب البيانات JSON
     @GetMapping("/admin/data")
     @ResponseBody
-    public List<Stagiaire> data() {
+    public List<Stagiaire> getStagiaires() {
         return repository.findAll();
     }
 
-    // تحديث الحالة
     @PostMapping("/admin/update-status/{id}")
     @ResponseBody
-    public String update(@PathVariable Long id, @RequestParam String status) {
+    public String updateStatus(@PathVariable Long id, @RequestParam String status) {
         try {
             Stagiaire s = repository.findById(id).orElseThrow();
             s.setStatus(status);
@@ -63,9 +53,9 @@ public class StagiaireController {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("khachansalah48@gmail.com");
             message.setTo(to);
-            message.setSubject("SRM Stage Update");
+            message.setSubject("Mise à jour de votre stage");
             message.setText("Bonjour " + name + ", votre demande est " + status);
             mailSender.send(message);
-        } catch (Exception e) { }
+        } catch (Exception e) {}
     }
 }
