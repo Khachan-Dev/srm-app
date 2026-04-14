@@ -16,26 +16,22 @@ public class StagiaireController {
     @Autowired
     private JavaMailSender mailSender;
 
-    // تفتيح صفحة الفورم (index.html من templates)
     @GetMapping("/")
     public String home() {
         return "index";
     }
 
-    // تفتيح صفحة الإدارة (admin.html من templates)
     @GetMapping("/admin")
     public String adminPage() {
         return "admin";
     }
 
-    // جلب البيانات للجدول (JSON)
     @GetMapping("/admin/data")
     @ResponseBody
     public List<Stagiaire> getAllStagiaires() {
         return repository.findAll();
     }
 
-    // تحديث الحالة وإرسال الإيميل
     @PostMapping("/admin/update-status/{id}")
     @ResponseBody
     public String updateStatus(@PathVariable Long id, @RequestParam String status) {
@@ -68,7 +64,7 @@ public class StagiaireController {
             }
             mailSender.send(message);
         } catch (Exception e) {
-            System.out.println("Erreur Email: " + e.getMessage());
+            System.err.println("Erreur Email: " + e.getMessage());
         }
     }
 }
