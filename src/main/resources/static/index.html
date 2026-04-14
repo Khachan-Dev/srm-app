@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Demande de Stage - SRM</title>
     
-    <link rel="manifest" href="/manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="icon" href="/images/logo.png" type="image/png">
-    <link rel="apple-touch-icon" href="/images/logo.png">
     <meta name="theme-color" content="#1a73e8">
 
     <style>
@@ -73,7 +69,18 @@
         }
         button:hover { background: #1557b0; }
         
-        /* تحسينات للشاشة الصغيرة */
+        /* رسالة النجاح */
+        .alert-success {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
         @media (max-width: 480px) {
             .form-container { padding: 20px; }
             h2 { font-size: 20px; }
@@ -87,9 +94,13 @@
             <img src="/images/logo.png" alt="Logo SRM">
         </div>
 
+        <div id="successMsg" class="alert-success">
+            Votre demande a été envoyée avec succès !
+        </div>
+
         <h2>Postuler pour un Stage</h2>
         
-        <form action="/api/stagiaires/register" method="POST">
+        <form action="/api/stagiaires/register" method="POST" id="registrationForm">
             <div class="input-group"><input type="text" name="nom" placeholder="Nom" required></div>
             <div class="input-group"><input type="text" name="prenom" placeholder="Prénom" required></div>
             <div class="input-group"><input type="email" name="email" placeholder="Email (pour la réponse)" required></div>
@@ -102,14 +113,11 @@
     </div>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(reg => {
-                    console.log('SW Registered!', reg);
-                }).catch(err => {
-                    console.log('SW Registration failed: ', err);
-                });
-            });
+        // كود بسيط باش نعرفو بلي الطلب داز
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('success')) {
+            document.getElementById('successMsg').style.display = 'block';
+            document.getElementById('registrationForm').style.display = 'none';
         }
     </script>
 </body>
