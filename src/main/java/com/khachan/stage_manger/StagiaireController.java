@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -15,6 +16,9 @@ public class StagiaireController {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    // كلمة السر لصفحة الأدمين (تقدر تبدلها)
+    private final String ADMIN_PASSWORD = "SRM_2026_ADMIN";
 
     // دالة مساعدة لإرسال الإيميلات
     private void sendEmail(String to, String subject, String body) {
@@ -30,35 +34,47 @@ public class StagiaireController {
         }
     }
 
-    // 1. تسجيل متدرب جديد + إرسال إيميل تأكيد فوري
+    // --- [ توجيه الصفحات ] ---
+
+    // 1. المتدرب كيدخل للفورميلير (الصفحة الرئيسية)
+    @GetMapping("/")
+    public String showIndex() {
+        return "index"; 
+    }
+
+    // 2. صفحة الأدمين (مع حماية بسيطة بـ Password في الرابط)
+    // غاتدخل ليها هكا: /admin?key=SRM_2026_ADMIN
+    @GetMapping("/admin")
+    public String showAdminPage(@RequestParam(name="key", required=false) String key, Model model) {
+        if (key != null && key.equals(ADMIN_PASSWORD)) {
+            List<Stagiaire> list = repository.findAll();
+            model.addAttribute("stagiaires", list);
+            return "admin";
+        }
+        return "redirect:/"; // إلا كان الكود غلط كيرجعو للفورم
+    }
+
+    // --- [ العمليات التقنية API ] ---
+
+    // 3. تسجيل متدرب جديد
     @PostMapping("/api/stagiaires/register")
     public String register(@ModelAttribute Stagiaire stagiaire) {
         if (stagiaire.getStatus() == null) {
             stagiaire.setStatus("En attente");
         }
-        
-        // حفظ في قاعدة البيانات
         repository.save(stagiaire);
 
         // إرسال إيميل التأكيد للمتدرب
         sendEmail(stagiaire.getEmail(), 
             "Confirmation de réception - Demande de Stage", 
             "Bonjour " + stagiaire.getPrenom() + ",\n\n" +
-            "Nous avons bien reçu votre demande de stage. Votre dossier est actuellement en cours de traitement.\n" +
-            "Vous recevrez un autre e-mail dès qu'une décision sera prise par l'administration.\n\n" +
+            "Nous avons bien reçu votre demande de stage. Votre dossier est en cours de traitement.\n" +
             "Cordialement.");
 
-        return "redirect:/success.html";
+        return "redirect:/"; // كيرجعو للفورم (أو تقدر تصاوب صفحة success)
     }
 
-    // 2. جلب البيانات لصفحة الـ Admin
-    @GetMapping("/admin/data")
-    @ResponseBody
-    public List<Stagiaire> getAllData() {
-        return repository.findAll();
-    }
-
-    // 3. قبول المتدرب + إرسال إيميل القبول
+    // 4. قبول المتدرب
     @GetMapping("/admin/accept/{id}")
     public String acceptStagiaire(@PathVariable Long id) {
         repository.findById(id).ifPresent(s -> {
@@ -67,12 +83,12 @@ public class StagiaireController {
             sendEmail(s.getEmail(), 
                 "Réponse positive - Demande de Stage", 
                 "Félicitations " + s.getPrenom() + ",\n\n" +
-                "Votre demande de stage a été ACCEPTÉE. Nous vous contacterons bientôt pour finaliser les démarches.");
+                "Votre demande de stage a été ACCEPTÉE.");
         });
-        return "redirect:/admin.html";
+        return "redirect:/admin?key=" + ADMIN_PASSWORD;
     }
 
-    // 4. رفض المتدرب + إرسال إيميل الرفض
+    // 5. رفض المتدرب
     @GetMapping("/admin/reject/{id}")
     public String rejectStagiaire(@PathVariable Long id) {
         repository.findById(id).ifPresent(s -> {
@@ -81,15 +97,15 @@ public class StagiaireController {
             sendEmail(s.getEmail(), 
                 "Réponse - Demande de Stage", 
                 "Bonjour " + s.getPrenom() + ",\n\n" +
-                "Malheureusement, nous ne pouvons pas donner une suite favorable à votre demande de stage pour le moment. Nous vous souhaitons bon courage dans vos recherches.");
+                "Malheureusement, votre demande a été refusée.");
         });
-        return "redirect:/admin.html";
+        return "redirect:/admin?key=" + ADMIN_PASSWORD;
     }
 
-    // 5. حذف الطلب نهائياً
+    // 6. حذف الطلب
     @GetMapping("/admin/delete/{id}")
     public String deleteStagiaire(@PathVariable Long id) {
         repository.deleteById(id);
-        return "redirect:/admin.html";
+        return "redirect:/admin?key=" + ADMIN_PASSWORD;
     }
 }

@@ -1,15 +1,23 @@
 {
   "name": "SRM Stage Manager",
   "short_name": "SRM Stage",
-  "start_url": "/",
+  "description": "Application de gestion des stagiaires pour SRM",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1a73e8",
   "icons": [
     {
       "src": "/images/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

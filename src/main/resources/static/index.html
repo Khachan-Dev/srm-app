@@ -9,35 +9,108 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="icon" href="/images/logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="/images/logo.png">
     <meta name="theme-color" content="#1a73e8">
 
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; direction: ltr; }
-        .form-container { background: white; max-width: 500px; margin: auto; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f0f2f5; 
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .form-container { 
+            background: white; 
+            width: 100%;
+            max-width: 450px; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+        }
         .logo-box { text-align: center; margin-bottom: 20px; }
-        .logo-box img { width: 180px; height: auto; }
-        h2 { text-align: center; color: #1a73e8; margin-bottom: 25px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #1a73e8; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        .logo-box img { 
+            width: 150px; 
+            height: auto; 
+            object-fit: contain;
+        }
+        h2 { 
+            text-align: center; 
+            color: #1a73e8; 
+            margin-bottom: 25px; 
+            font-size: 24px;
+        }
+        .input-group { margin-bottom: 15px; }
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            border: 1.5px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus { 
+            outline: none; 
+            border-color: #1a73e8; 
+            background: #f8fbff;
+        }
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            background: #1a73e8; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 18px;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
         button:hover { background: #1557b0; }
+        
+        /* تحسينات للشاشة الصغيرة */
+        @media (max-width: 480px) {
+            .form-container { padding: 20px; }
+            h2 { font-size: 20px; }
+        }
     </style>
 </head>
 <body>
+
     <div class="form-container">
         <div class="logo-box">
             <img src="/images/logo.png" alt="Logo SRM">
         </div>
 
         <h2>Postuler pour un Stage</h2>
+        
         <form action="/api/stagiaires/register" method="POST">
-            <input type="text" name="nom" placeholder="Nom" required>
-            <input type="text" name="prenom" placeholder="Prénom" required>
-            <input type="email" name="email" placeholder="Votre Email (pour la réponse)" required>
-            <input type="text" name="telephone" placeholder="Téléphone" required>
-            <input type="text" name="filiere" placeholder="Filière / Spécialité" required>
-            <input type="text" name="ecole" placeholder="Établissement / École">
+            <div class="input-group"><input type="text" name="nom" placeholder="Nom" required></div>
+            <div class="input-group"><input type="text" name="prenom" placeholder="Prénom" required></div>
+            <div class="input-group"><input type="email" name="email" placeholder="Email (pour la réponse)" required></div>
+            <div class="input-group"><input type="tel" name="telephone" placeholder="Téléphone" required></div>
+            <div class="input-group"><input type="text" name="filiere" placeholder="Filière / Spécialité" required></div>
+            <div class="input-group"><input type="text" name="ecole" placeholder="Établissement / École"></div>
+            
             <button type="submit">Envoyer la demande</button>
         </form>
     </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(reg => {
+                    console.log('SW Registered!', reg);
+                }).catch(err => {
+                    console.log('SW Registration failed: ', err);
+                });
+            });
+        }
+    </script>
 </body>
 </html>
