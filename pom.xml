@@ -58,17 +58,24 @@
     </dependencies>
 
     <build>
-    <resources>
-        <resource>
-            <directory>src/main/resources</directory>
-            <filtering>false</filtering>
-        </resource>
-    </resources>
     <plugins>
         <plugin>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>
         </plugin>
     </plugins>
+    
+    <resources>
+        <resource>
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>**/*.html</include>
+                <include>**/*.properties</include>
+                <include>**/*.png</include>
+                <include>**/*.js</include>
+                <include>**/*.json</include>
+            </includes>
+        </resource>
+    </resources>
 </build>
 </project>
